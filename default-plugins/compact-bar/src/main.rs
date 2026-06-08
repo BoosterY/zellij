@@ -285,18 +285,8 @@ impl State {
         }
     }
 
-    fn handle_clipboard_copy(&mut self, copy_destination: CopyDestination) -> bool {
-        if self.is_tooltip {
-            return false;
-        }
-
-        let should_render = match self.text_copy_destination {
-            Some(current) => current != copy_destination,
-            None => true,
-        };
-
-        self.text_copy_destination = Some(copy_destination);
-        should_render
+    fn handle_clipboard_copy(&mut self, _copy_destination: CopyDestination) -> bool {
+        false
     }
 
     fn handle_clipboard_failure(&mut self) -> bool {

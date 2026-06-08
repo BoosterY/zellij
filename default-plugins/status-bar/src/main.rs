@@ -240,19 +240,7 @@ impl ZellijPlugin for State {
                 }
                 self.tabs = tabs;
             },
-            Event::CopyToClipboard(copy_destination) => {
-                match self.text_copy_destination {
-                    Some(text_copy_destination) => {
-                        if text_copy_destination != copy_destination {
-                            should_render = true;
-                        }
-                    },
-                    None => {
-                        should_render = true;
-                    },
-                }
-                self.text_copy_destination = Some(copy_destination);
-            },
+            Event::CopyToClipboard(_copy_destination) => {},
             Event::SystemClipboardFailure => {
                 should_render = true;
                 self.display_system_clipboard_failure = true;
