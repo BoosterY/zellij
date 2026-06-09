@@ -824,6 +824,7 @@ impl TryFrom<crate::client_server_contract::client_server_contract::Options>
                 .transpose()?,
             scroll_buffer_size: options.scroll_buffer_size.map(|s| s as usize),
             copy_command: options.copy_command,
+            paste_command: None,
             copy_clipboard: options
                 .copy_clipboard
                 .map(|c| match ProtoClipboard::from_i32(c) {

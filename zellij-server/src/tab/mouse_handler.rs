@@ -183,6 +183,9 @@ enum MouseAction {
     FrameIntercepted {
         pane_id: PaneId,
     },
+    MiddleClickPaste {
+        pane_id: PaneId,
+    },
     NoAction,
 }
 
@@ -805,6 +808,24 @@ impl MouseHandler {
                 tab.set_force_render();
                 Ok(MouseEffect::state_changed())
             },
+            MouseAction::MiddleClickPaste { pane_id: _ } => {
+                if let Some(paste_cmd) = &tab.paste_command {
+                    let mut cmd_parts = paste_cmd.split_whitespace();
+                    let program = cmd_parts.next().unwrap_or("");
+                    let args: Vec<&str> = cmd_parts.collect();
+                    let clipboard_text = std::process::Command::new(program)
+                        .args(&args)
+                        .output()
+                        .ok()
+                        .and_then(|o| if o.status.success() { Some(o.stdout) } else { None });
+                    if let Some(text) = clipboard_text {
+                        if !text.is_empty() {
+                            tab.paste_to_active_terminal(text, client_id, None)?;
+                        }
+                    }
+                }
+                Ok(MouseEffect::default())
+            },
             MouseAction::NoAction => Ok(MouseEffect::default()),
         }
     }
@@ -1425,11 +1446,8 @@ impl MouseHandler {
                 return Ok(MouseAction::NoAction);
             };
             let is_active_pane = Some(pane_id) == ctx.active_pane_id;
-            if is_active_pane {
-                return Ok(MouseAction::SendToTerminal {
-                    pane_id,
-                    event: *event,
-                });
+            if is_active_pane && event.event_type == MouseEventType::Press {
+                return Ok(MouseAction::MiddleClickPaste { pane_id });
             }
             return Ok(MouseAction::NoAction);
         }

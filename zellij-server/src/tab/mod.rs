@@ -188,6 +188,7 @@ pub(crate) struct Tab {
     pane_being_resized_with_mouse: Option<PaneResizeState>,
     link_handler: Rc<RefCell<LinkHandler>>,
     clipboard_provider: ClipboardProvider,
+    paste_command: Option<String>,
     // TODO: used only to focus the pane when the layout is loaded
     // it seems that optimization is possible using `active_panes`
     focus_pane_id: Option<PaneId>,
@@ -834,6 +835,7 @@ impl Tab {
             Some(command) => ClipboardProvider::Command(CopyCommand::new(command)),
             None => ClipboardProvider::Osc52(copy_options.clipboard),
         };
+        let paste_command = copy_options.paste_command;
         let swap_layouts = SwapLayouts::new(swap_layouts, display_area.clone());
 
         Tab {
@@ -867,6 +869,7 @@ impl Tab {
             pane_being_resized_with_mouse: None,
             link_handler: Rc::new(RefCell::new(LinkHandler::new())),
             clipboard_provider,
+            paste_command,
             focus_pane_id: None,
             copy_on_select: copy_options.copy_on_select,
             terminal_emulator_colors,
@@ -5987,6 +5990,7 @@ impl Tab {
             None => ClipboardProvider::Osc52(copy_options.clipboard),
         };
         self.copy_on_select = copy_options.copy_on_select;
+        self.paste_command = copy_options.paste_command.clone();
     }
     pub fn update_auto_layout(&mut self, auto_layout: bool) {
         self.auto_layout = auto_layout;
