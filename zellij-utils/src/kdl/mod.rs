@@ -2702,6 +2702,8 @@ impl Options {
                 .map(|(scroll_buffer_size, _entry)| scroll_buffer_size as usize);
         let copy_command = kdl_property_first_arg_as_string_or_error!(kdl_options, "copy_command")
             .map(|(copy_command, _entry)| copy_command.to_string());
+        let paste_command = kdl_property_first_arg_as_string_or_error!(kdl_options, "paste_command")
+            .map(|(paste_command, _entry)| paste_command.to_string());
         let copy_clipboard =
             match kdl_property_first_arg_as_string_or_error!(kdl_options, "copy_clipboard") {
                 Some((string, entry)) => Some(Clipboard::from_str(string).map_err(|_| {
@@ -2842,6 +2844,7 @@ impl Options {
             on_force_close,
             scroll_buffer_size,
             copy_command,
+            paste_command,
             copy_clipboard,
             copy_on_select,
             osc8_hyperlinks,
@@ -3376,6 +3379,39 @@ impl Options {
             Some(node)
         } else if add_comments {
             let mut node = create_node("pbcopy");
+            node.set_leading(format!("{}\n// ", comment_text));
+            Some(node)
+        } else {
+            None
+        }
+    }
+    fn paste_command_to_kdl(&self, add_comments: bool) -> Option<KdlNode> {
+        let comment_text = format!(
+            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+            " ",
+            "// Command to read clipboard content for middle-click paste.",
+            "// When set, middle-clicking the active pane will execute this command",
+            "// and paste its stdout into the terminal.",
+            "// Examples:",
+            "//",
+            "// paste_command \"xclip -selection clipboard -o\" // x11",
+            "// paste_command \"wl-paste --no-newline\"         // wayland",
+            "// paste_command \"pbpaste\"                       // osx",
+        );
+
+        let create_node = |node_value: &str| -> KdlNode {
+            let mut node = KdlNode::new("paste_command");
+            node.push(node_value.to_owned());
+            node
+        };
+        if let Some(paste_command) = &self.paste_command {
+            let mut node = create_node(paste_command);
+            if add_comments {
+                node.set_leading(format!("{}\n", comment_text));
+            }
+            Some(node)
+        } else if add_comments {
+            let mut node = create_node("pbpaste");
             node.set_leading(format!("{}\n// ", comment_text));
             Some(node)
         } else {
@@ -4296,6 +4332,9 @@ impl Options {
         }
         if let Some(copy_command) = self.copy_command_to_kdl(add_comments) {
             nodes.push(copy_command);
+        }
+        if let Some(paste_command) = self.paste_command_to_kdl(add_comments) {
+            nodes.push(paste_command);
         }
         if let Some(copy_clipboard) = self.copy_clipboard_to_kdl(add_comments) {
             nodes.push(copy_clipboard);

@@ -102,6 +102,11 @@ pub struct Options {
     #[serde(default)]
     pub copy_command: Option<String>,
 
+    /// Command to read clipboard content for middle-click paste
+    #[clap(long, value_parser)]
+    #[serde(default)]
+    pub paste_command: Option<String>,
+
     /// OSC52 destination clipboard
     #[clap(
         long,
@@ -334,6 +339,7 @@ impl Options {
         let on_force_close = other.on_force_close.or(self.on_force_close);
         let scroll_buffer_size = other.scroll_buffer_size.or(self.scroll_buffer_size);
         let copy_command = other.copy_command.or_else(|| self.copy_command.clone());
+        let paste_command = other.paste_command.or_else(|| self.paste_command.clone());
         let copy_clipboard = other.copy_clipboard.or(self.copy_clipboard);
         let copy_on_select = other.copy_on_select.or(self.copy_on_select);
         let osc8_hyperlinks = other.osc8_hyperlinks.or(self.osc8_hyperlinks);
@@ -402,6 +408,7 @@ impl Options {
             on_force_close,
             scroll_buffer_size,
             copy_command,
+            paste_command,
             copy_clipboard,
             copy_on_select,
             osc8_hyperlinks,
@@ -473,6 +480,7 @@ impl Options {
         let on_force_close = other.on_force_close.or(self.on_force_close);
         let scroll_buffer_size = other.scroll_buffer_size.or(self.scroll_buffer_size);
         let copy_command = other.copy_command.or_else(|| self.copy_command.clone());
+        let paste_command = other.paste_command.or_else(|| self.paste_command.clone());
         let copy_clipboard = other.copy_clipboard.or(self.copy_clipboard);
         let copy_on_select = other.copy_on_select.or(self.copy_on_select);
         let osc8_hyperlinks = other.osc8_hyperlinks.or(self.osc8_hyperlinks);
@@ -537,6 +545,7 @@ impl Options {
             on_force_close,
             scroll_buffer_size,
             copy_command,
+            paste_command,
             copy_clipboard,
             copy_on_select,
             osc8_hyperlinks,

@@ -378,6 +378,15 @@ load_plugins {
 // copy_command "wl-copy"                    // wayland
 // copy_command "pbcopy"                     // osx
 
+// Command to read clipboard content for middle-click paste.
+// When set, middle-clicking the active pane will execute this command
+// and paste its stdout into the terminal.
+// Examples:
+//
+// paste_command "xclip -selection clipboard -o" // x11
+// paste_command "wl-paste --no-newline"         // wayland
+// paste_command "pbpaste"                       // osx
+
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
 // Does not apply when using copy_command.

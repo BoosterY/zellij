@@ -1230,6 +1230,7 @@ impl From<&ScreenInstruction> for ScreenContext {
 #[derive(Debug, Clone)]
 pub(crate) struct CopyOptions {
     pub command: Option<String>,
+    pub paste_command: Option<String>,
     pub clipboard: Clipboard,
     pub copy_on_select: bool,
 }
@@ -1237,11 +1238,13 @@ pub(crate) struct CopyOptions {
 impl CopyOptions {
     pub(crate) fn new(
         copy_command: Option<String>,
+        paste_command: Option<String>,
         copy_clipboard: Clipboard,
         copy_on_select: bool,
     ) -> Self {
         Self {
             command: copy_command,
+            paste_command,
             clipboard: copy_clipboard,
             copy_on_select,
         }
@@ -1251,6 +1254,7 @@ impl CopyOptions {
     pub(crate) fn default() -> Self {
         Self {
             command: None,
+            paste_command: None,
             clipboard: Clipboard::default(),
             copy_on_select: true,
         }
@@ -5622,6 +5626,7 @@ pub(crate) fn screen_thread_main(
         .map(|l| format!("{}", l.display()));
     let copy_options = CopyOptions::new(
         config_options.copy_command,
+        config_options.paste_command,
         config_options.copy_clipboard.unwrap_or_default(),
         config_options.copy_on_select.unwrap_or(true),
     );
